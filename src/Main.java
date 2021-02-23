@@ -1,13 +1,13 @@
-import boardgame.Position;
+import boardgame.Board;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("Printing position (testing:)");
+        System.out.println("Instantiating a board (testing:)");
 
-        Position position = new Position(3 ,4);
+        Board board = new Board(8,8);
 
-        System.out.println(position);
+        System.out.println(board);
     }
 }
