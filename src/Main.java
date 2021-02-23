@@ -1,13 +1,17 @@
-import boardgame.Board;
+import chess.ChessMatch;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("Instantiating a board (testing:)");
+        System.out.println();
+        System.out.println("Instantiating a chessMatch (testing:)");
+        System.out.println();
 
-        Board board = new Board(8,8);
+        ChessMatch chessMatch = new ChessMatch();
 
-        System.out.println(board);
+        UI.printBoard(chessMatch.getPieces());
+
+
     }
 }
