@@ -6,7 +6,7 @@ import chess.Color;
 
 public class King extends ChessPiece {
 
-    // Esta é a classe que representa a peça Torre
+    // Esta é a classe que representa a peça Rei
 
 
     public King(Board board, Color color) {
@@ -18,7 +18,7 @@ public class King extends ChessPiece {
         return "K";
         /*
          Faço isso para que seja impresso um K no tabuleiro na posição em que
-         a torre está
+         o rei está
          */
     }
 }
