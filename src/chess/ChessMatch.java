@@ -1,8 +1,8 @@
 package chess;
 
 import boardgame.Board;
-import boardgame.Position;
-import chess.pieces.*;
+import chess.pieces.Queen;
+import chess.pieces.Rook;
 
 public class ChessMatch {
 
@@ -48,11 +48,23 @@ public class ChessMatch {
 
     }
 
+    /*
+    I create a method for placing a new piece on the chess board using the chess labels
+    for positions (section 155)
+
+     */
+
+    private void placeNewPiece(char column, int row, ChessPiece piece) {
+
+        board.placePiece(piece, new ChessPosition(column, row).toPosition());
+    }
+
     /* Below, I create the method initialSetup, responsible for initializing the chess match
     putting the pieces on the board.
     */
 
     private void initialSetup() {
+        /*
         board.placePiece(new Rook(board, Color.WHITE), new Position(2,1));
         board.placePiece(new King(board, Color.BLACK), new Position(0,4));
         board.placePiece(new King(board, Color.WHITE), new Position(7,4));
@@ -61,6 +73,16 @@ public class ChessMatch {
         board.placePiece(new Pawn(board, Color.WHITE), new Position(1,5));
         board.placePiece(new Knight(board, Color.WHITE), new Position(5,7));
 
+        // The code above was written for testing, but the positions are entered
+        //   in matricial coordinates. initialSetup was one of the first classes to be created.
+        // The class written above initialSetup (placeNewPiece) is newer than initialSetup.
+        // Thus, after the creation of placeNewPiece, the code in initialSetup must be changed
+        //   to accept chess-board coordinates.
+
+         */
+
+        placeNewPiece('b', 6, new Rook(board, Color.WHITE)); // for testing
+        placeNewPiece('f', 3, new Queen(board, Color.BLACK)); // for testing
 
 
         // After this, I must call this method in the constructor above.

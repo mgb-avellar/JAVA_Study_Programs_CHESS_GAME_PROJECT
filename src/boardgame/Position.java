@@ -2,6 +2,12 @@ package boardgame;
 
 public class Position {
 
+    /*
+    A posição do tabuleiro é uma posição matricial, vai de (0,0) a (8,8), o que é
+    diferente da posição do xadrez, cujas linhas vão de 1 a 8 e as colunas de 'a' a 'h'.
+    Inclusive, a posição matricial é lida (row, column) e a do xadrez (column, row)
+     */
+
     private int row;
     private int column;
 
