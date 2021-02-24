@@ -13,7 +13,7 @@ public class ChessPosition {
         if ( columnChessChar < 'a' || columnChessChar > 'h' || rowChessNumber < 1 || rowChessNumber > 8) {
 
             throw new ChessException("Error in instantiating ChessPosition: " +
-                    "valid values for columns are from 1 to 8 and for row from 'a' to 'h'.");
+                    "valid values for columns are from 'a' to 'h' and for rows from 1 to 8.");
         }
 
         this.columnChessChar = columnChessChar;

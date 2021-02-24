@@ -1,5 +1,9 @@
 import chess.ChessPiece;
+import chess.ChessPosition;
 import chess.Color;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class UI {
 
@@ -32,6 +36,26 @@ public class UI {
         System.out.flush();
     }
 
+    // Below, a method for reading a chess position from the user
+
+    public static ChessPosition readChessPosition(Scanner sc) {
+
+        // Recall that the user will type something like a1, f6, h2 etc;
+
+        try {
+            String s = sc.nextLine();
+            char column = s.charAt(0);
+            int row = Integer.parseInt(s.substring(1));
+
+            return new ChessPosition(column, row);
+        }
+        catch (RuntimeException e) {
+            throw new InputMismatchException("Error in reading ChessPosition: " +
+                    "valid values for columns are from 'a' to 'h' and for rows from 1 to 8.");
+        }
+
+        // The try-catch block prevents mismatch input format
+    }
 
 
     public static void printBoard(ChessPiece[][] pieces) {

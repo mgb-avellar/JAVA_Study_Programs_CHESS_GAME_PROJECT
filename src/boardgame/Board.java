@@ -91,6 +91,27 @@ public class Board {
          */
     }
 
+    public Piece removePiece(Position position) {
+        // Defensive programming
+        if (!positionExists(position)) {
+
+            throw new BoardException("Position not on the board.");
+        }
+
+        if (piece(position) == null) {
+            // Se a peça, nessa posição, for nula, é porque não existe peça aí
+            // Então retorno nulo.
+            return null;
+        }
+        // Below, the procedure to remove the piece.
+
+        Piece aux = piece(position); // receives the piece on the board that is in this position
+        aux.position = null;  // I impose the null to this position; I removed it.
+        piecesMatrix[position.getRow()][position.getColumn()] = null; // I update the board matrix
+
+        return aux;
+    }
+
     /*
     The next two methods are important:
     - positionExists tells me if the position exists in the board, so a piece can be or move there
@@ -120,4 +141,6 @@ public class Board {
 
         return piece(position) != null;
     }
+
+
 }
