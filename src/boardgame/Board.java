@@ -45,4 +45,20 @@ public class Board {
     public Piece piece(Position position) {
         return piecesMatrix[position.getRow()][position.getColumn()];
     }
+
+    /*
+     A seguir, criaremos um método para colocar uma determinada peça em
+     uma posição específica, ambos recebidos pelo método
+     */
+
+    public void placePiece(Piece piece, Position position) {
+
+        piecesMatrix[position.getRow()][position.getColumn()] = piece;
+        piece.position = position;  // Preciso informar que a posição da peça não é mais nula
+        /*
+        Note que a posição da peça, que está na classe Piece, no pacote
+        boardgame, é acessível porque lá definimos essa variável como
+        protected e Board e Piece estão no mesmo pacote.
+         */
+    }
 }
