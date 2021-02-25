@@ -159,6 +159,8 @@ public class ChessMatch {
         placeNewPiece('e', 8, new Rook(board, Color.BLACK));
         placeNewPiece('d', 8, new King(board, Color.BLACK));
 
+        placeNewPiece('c', 4, new King(board, Color.BLACK));
+
 
         // After this, I must call this method in the constructor above.
         // Notice that Position(2,1) is a matrix position of the board layer, not of the chess layer
