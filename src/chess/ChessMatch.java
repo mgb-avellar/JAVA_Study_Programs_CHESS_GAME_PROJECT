@@ -8,6 +8,7 @@ import chess.pieces.Rook;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChessMatch {
 
@@ -18,6 +19,7 @@ public class ChessMatch {
 
     private int turn;
     private Color currentPlayer;
+    private boolean check;
 
     private Board board; // Every match has it own board
 
@@ -43,6 +45,11 @@ public class ChessMatch {
 
     public Color getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public boolean getCheck() {
+        return check;
+        // This getter is needed to fully implement the check logic. I must leave this attribute accessible in the UI class to release a warning.
     }
 
     public ChessPiece[][] getPieces() {
@@ -101,6 +108,22 @@ public class ChessMatch {
         validateSourcePosition(source);
         validateTargetPosition(source, target);  // Created after implementing the Rook moves
         Piece capturedPiece = makeMove(source, target);
+
+        /*
+        In implementing the check logic, I need to guarantee that I cannot put myself in a check position.
+        Thus, I must test this each time I make a movement.
+        I also need to check if my opponent is in check.
+        (See the two methods below.)
+         */
+
+        if ( testCheck(currentPlayer)) { // If this statement is true, then I put myself in check
+
+            undoMove(source, target, capturedPiece);
+            throw new ChessException("You can not put yourself in check.");
+        }
+
+        check = ( testCheck(opponent(currentPlayer)) ) ? true : false;
+
         nextTurn(); // Must be called after a move
         return (ChessPiece) capturedPiece;
     }
@@ -166,6 +189,75 @@ public class ChessMatch {
     }
 
     /*
+        I need to create a method to undo the move if I put my King deliberately in check.
+     */
+
+    private void undoMove(Position source, Position target, Piece capturedPiece) {
+        Piece auxP = board.removePiece(target);
+        board.placePiece(auxP, source);
+
+        if (capturedPiece != null) {
+            board.placePiece(capturedPiece, target);
+        }
+
+        capturedPiecesList.remove(capturedPiece);
+        piecesOnTheBoardList.add(capturedPiece);
+    }
+
+    /*
+        We create a method that returns black if the color of the piece is white and white if
+        the color of the piece is black.
+        This method is needed to implement the check logic
+     */
+
+    private Color opponent(Color color) {
+        return (color == Color.WHITE) ? Color.BLACK : Color.WHITE;
+    }
+
+    /*
+    I create the method 'king(color)'. We need it to localize the king of a given color because
+    we must always keep attention to the board since we can check the opponent's King when we
+    are deciding where to move a piece to.
+     */
+
+    private ChessPiece king(Color color) {
+
+        List<Piece> list =  piecesOnTheBoardList.stream().filter(x -> ((ChessPiece) x).getColor() == color ).collect(Collectors.toList());
+        for (Piece p : list) {
+            if (p instanceof King) {
+                return (ChessPiece) p;
+            }
+        }
+        throw new IllegalStateException("There is no " + color + " king on the board."); // This exception should never occur.
+    }
+
+    /*
+    Now, I will implement a method to test a check. For this, I need to run over all of my adversary's pieces and
+    see if for anyone of them there is a possible movement that can check my King.
+     */
+
+    private  boolean testCheck(Color color) {
+
+        Position kingPosition = king(color).getChessPosition().toPosition();
+        List<Piece> opponentPiecesList = piecesOnTheBoardList.stream().filter(x -> ((ChessPiece) x).getColor() == opponent(color) ).collect(Collectors.toList());
+        // In the above line I use the opponent(Color color) method.
+
+        for (Piece p : opponentPiecesList) {
+
+            boolean[][] matrix = p.possibleMoves();
+            if ( matrix[kingPosition.getRow()][kingPosition.getColumn()]  ) {  // If this statement is true, my King in on check
+
+                return true;
+            }
+            /*
+            This 'for' will look for each adversary's pieces possible moves if the position of my King belongs to
+            the track of one of these possible movements.
+             */
+        }
+        return false;
+    }
+
+    /*
     I create a method for placing a new piece on the chess board using the chess labels
     for positions (section 155)
 
@@ -215,7 +307,7 @@ public class ChessMatch {
         placeNewPiece('e', 8, new Rook(board, Color.BLACK));
         placeNewPiece('d', 8, new King(board, Color.BLACK));
 
-        placeNewPiece('c', 4, new King(board, Color.BLACK));
+        //placeNewPiece('c', 4, new King(board, Color.BLACK));
 
 
         // After this, I must call this method in the constructor above.

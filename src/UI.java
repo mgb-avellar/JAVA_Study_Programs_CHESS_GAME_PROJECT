@@ -79,6 +79,13 @@ public class UI {
         System.out.println("Turn: " + chessMatch.getTurn());
         System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
 
+        // The test below is to test if there is some player in check.
+
+        if (chessMatch.getCheck()) { // If this statement is true, there is someone in check.
+
+            System.out.println("CHECK! ");
+        }
+
     }
 
     public static void printBoard(ChessPiece[][] pieces) {

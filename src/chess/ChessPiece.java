@@ -16,6 +16,19 @@ public abstract class ChessPiece extends Piece {
          */
     }
 
+    /*
+        In order to implement the check logic, I need to create a getter for the chessPosition and test
+        if my King can move or not to this position and to see if there is a adversary piece threatening
+        my King.
+     */
+
+    public ChessPosition getChessPosition () {
+        return ChessPosition.fromPosition(position);
+        /*
+         Recalling that this 'position' variable if from the Piece class in the boardgame layer
+         */
+    }
+
     public Color getColor() {
         return color;
     }
