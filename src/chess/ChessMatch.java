@@ -13,11 +13,24 @@ public class ChessMatch {
     for the chess game.
      */
 
+    private int turn;
+    private Color currentPlayer;
+
     private Board board; // Every match has it own board
 
     public ChessMatch() {
         this.board = new Board(8,8);
+        this.turn = 1; // I begin in turn 1
+        this.currentPlayer = Color.WHITE; // The white player is the one who begins to play
         initialSetup(); // See below for explanations
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public Color getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public ChessPiece[][] getPieces() {
@@ -76,6 +89,7 @@ public class ChessMatch {
         validateSourcePosition(source);
         validateTargetPosition(source, target);  // Created after implementing the Rook moves
         Piece capturedPiece = makeMove(source, target);
+        nextTurn(); // Must be called after a move
         return (ChessPiece) capturedPiece;
     }
 
@@ -84,6 +98,15 @@ public class ChessMatch {
     private void validateSourcePosition(Position position) {
         if (!board.thereIsAPiece(position)) {
             throw new ChessException("There is no piece on the source position.");
+        }
+
+        /*
+         Problem is that when changing turns I must check if the actual player is of the same color
+         of the chosen piece. In other words, I can not move any of my adversary's piece. So:
+         */
+
+        if ( currentPlayer != ((ChessPiece) board.piece(position)).getColor() ) {
+            throw new ChessException("The chosen piece is not yours.");
         }
 
         /*
@@ -102,6 +125,12 @@ public class ChessMatch {
         if (!board.piece(source).possibleMove(target)) {
             throw new ChessException("The chosen piece can not move to the target position");
         }
+    }
+
+    // the method to change turns
+    private void nextTurn () {
+        turn ++;
+        currentPlayer = (currentPlayer == Color.WHITE) ? Color.BLACK : Color.WHITE;
     }
 
     private Piece makeMove(Position source, Position target) {

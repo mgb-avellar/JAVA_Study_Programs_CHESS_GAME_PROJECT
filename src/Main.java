@@ -24,7 +24,8 @@ public class Main {
                 // Dealing with ChessException and InputMismatchException exceptions
 
                 UI.clearScreen();
-                UI.printBoard(chessMatch.getPieces());
+                // UI.printBoard(chessMatch.getPieces());
+                UI.printMatch(chessMatch);
                 System.out.println();
                 System.out.print("Source position: ");
                 ChessPosition source = UI.readChessPosition(sc);

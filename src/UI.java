@@ -1,3 +1,4 @@
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.Color;
@@ -57,6 +58,23 @@ public class UI {
         // The try-catch block prevents mismatch input format
     }
 
+    /*
+     Now we are going to build a method to print the match
+     */
+
+    public static void printMatch(ChessMatch chessMatch) {
+
+        /*
+        Printing the match is more than print the board. We must print the board with the current pieces
+        and the turns. I need to update the Main class to print the match instead the board
+         */
+
+        printBoard(chessMatch.getPieces());
+        System.out.println();
+        System.out.println("Turn: " + chessMatch.getTurn());
+        System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
+
+    }
 
     public static void printBoard(ChessPiece[][] pieces) {
 
