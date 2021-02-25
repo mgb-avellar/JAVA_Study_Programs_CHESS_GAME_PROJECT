@@ -20,4 +20,14 @@ public class Bishop extends ChessPiece {
          o bispo está
          */
     }
+
+    @Override
+    public boolean[][] possibleMoves() {
+        /*
+         For now, we are not going to implement the possible moves of the Bishop.
+         We are just going to create a boolean matrix of the size of the board.
+         */
+        boolean[][] matrix = new boolean[getBoard().getNumberRows()][getBoard().getNumberColumns()];
+        return matrix;
+    }
 }

@@ -21,4 +21,14 @@ public class King extends ChessPiece {
          o rei está
          */
     }
+
+    @Override
+    public boolean[][] possibleMoves() {
+        /*
+         For now, we are not going to implement the possible moves of the King.
+         We are just going to create a boolean matrix of the size of the board.
+         */
+        boolean[][] matrix = new boolean[getBoard().getNumberRows()][getBoard().getNumberColumns()];
+        return matrix;
+    }
 }
