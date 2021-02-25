@@ -28,6 +28,14 @@ public class Main {
                 System.out.println();
                 System.out.print("Source position: ");
                 ChessPosition source = UI.readChessPosition(sc);
+
+                // Modification due to coloring the background of the board for possible moves
+
+                boolean[][] possibleMoves = chessMatch.possibleMoves(source);
+                UI.clearScreen();
+                UI.printBoard(chessMatch.getPieces(), possibleMoves); // Class overload
+
+
                 System.out.println();
                 System.out.print("Target position: ");
                 ChessPosition target = UI.readChessPosition(sc);

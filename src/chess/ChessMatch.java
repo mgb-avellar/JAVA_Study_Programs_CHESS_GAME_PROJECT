@@ -49,6 +49,22 @@ public class ChessMatch {
         return auxMatrix;
 
     }
+
+    /*
+    I want to color the background of the board with the possible moves of a piece.
+    I need to change the Main class and the UI class too.
+     */
+
+    public boolean[][] possibleMoves(ChessPosition sourcePosition) {
+
+        Position position = sourcePosition.toPosition();
+        validateSourcePosition(position);
+
+        return board.piece(position).possibleMoves();
+    }
+
+
+
     /*
     Method performChessMove - receives origin/source position, destiny/target position and returns
     a captured position if this is the case (this last action will be coded later)

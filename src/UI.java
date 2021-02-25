@@ -65,7 +65,7 @@ public class UI {
 
             System.out.print("   " + (8-i) + " | ");
             for (int j = 0; j < pieces.length; j++) {
-                printPiece(pieces[i][j]);
+                printPiece(pieces[i][j], false); // The 'false' is a modification due to the background coloring
             }
             System.out.println("|");
 
@@ -78,13 +78,42 @@ public class UI {
         System.out.println("       a b c d e f g h");
     }
 
-    private static void printPiece(ChessPiece piece) {
+    public static void printBoard(ChessPiece[][] pieces, boolean[][] possibleMoves) {
+
+        // Overload of print board to color the background of possible moves
+        // I need to change also the printPiece method
+        System.out.println("      _________________");
+        for (int i = 0; i < pieces.length; i++) {
+
+            System.out.print("   " + (8-i) + " | ");
+            for (int j = 0; j < pieces.length; j++) {
+                printPiece(pieces[i][j], possibleMoves[i][j]); // The 'possibleMoves' is a modification due to the background coloring
+            }
+            System.out.println("|");
+
+        }
+        //System.out.println("      _________________" + "\u0305");
+        System.out.println("       " + "\u0305" + " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305"
+                + " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305"
+                + " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305"
+                + " " + "\u0305"+ " " + "\u0305"+ " " + "\u0305");
+        System.out.println("       a b c d e f g h");
+    }
+
+    private static void printPiece(ChessPiece piece, boolean background) {
+
+        // Modification in this method due to coloring the background of possible moves
+
+        if (background) {
+
+            System.out.print(ANSI_GREEN_BACKGROUND);
+        }
 
         // Printing a single piece
 
         if (piece == null) {
 
-            System.out.print("-");
+            System.out.print("-" + ANSI_RESET);
         }
         else {
 
