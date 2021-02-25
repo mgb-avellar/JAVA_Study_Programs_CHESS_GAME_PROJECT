@@ -6,6 +6,9 @@ import boardgame.Position;
 import chess.pieces.King;
 import chess.pieces.Rook;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChessMatch {
 
     /*
@@ -17,6 +20,15 @@ public class ChessMatch {
     private Color currentPlayer;
 
     private Board board; // Every match has it own board
+
+    /*
+    We begin to implement the control over the pieces on the board and the captured pieces, storing them in lists.
+    We do this to take a piece off the board when it is captured.
+    We will have to update the constructor, the PlaceNewPiece and MakeMove
+     */
+
+    private List<Piece> piecesOnTheBoardList = new ArrayList<>();
+    private List<Piece> capturedPiecesList = new ArrayList<>();
 
     public ChessMatch() {
         this.board = new Board(8,8);
@@ -138,6 +150,18 @@ public class ChessMatch {
         Piece p = board.removePiece(source);
         Piece capturedPiece = board.removePiece(target);
         board.placePiece(p, target);
+
+        /*
+         If I capture a piece when moving, I must remove it from the list of pieces on the board and
+         insert it in the list of captured pieces.
+         */
+
+        if (capturedPiece != null) {
+
+            piecesOnTheBoardList.remove(capturedPiece);
+            capturedPiecesList.add(capturedPiece);
+        }
+
         return capturedPiece;
     }
 
@@ -150,6 +174,9 @@ public class ChessMatch {
     private void placeNewPiece(char column, int row, ChessPiece piece) {
 
         board.placePiece(piece, new ChessPosition(column, row).toPosition());
+        // Each time I instantiate a new piece on the board, I must insert them in the list of pieces on the board
+        piecesOnTheBoardList.add(piece);
+
     }
 
     /* Below, I create the method initialSetup, responsible for initializing the chess match
