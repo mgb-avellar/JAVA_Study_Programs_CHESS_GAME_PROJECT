@@ -58,6 +58,7 @@ public class ChessMatch {
         Position source = sourcePosition.toPosition();
         Position target = targetPosition.toPosition();
         validateSourcePosition(source);
+        validateTargetPosition(source, target);  // Created after implementing the Rook moves
         Piece capturedPiece = makeMove(source, target);
         return (ChessPiece) capturedPiece;
     }
@@ -79,6 +80,12 @@ public class ChessMatch {
             throw new ChessException("There is no possible moves for the chosen piece.");
         }
 
+    }
+
+    private void validateTargetPosition(Position source, Position target) {
+        if (!board.piece(source).possibleMove(target)) {
+            throw new ChessException("The chosen piece can not move to the target position");
+        }
     }
 
     private Piece makeMove(Position source, Position target) {
