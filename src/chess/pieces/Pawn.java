@@ -25,10 +25,7 @@ public class Pawn extends ChessPiece {
 
     @Override
     public boolean[][] possibleMoves() {
-        /*
-         For now, we are not going to implement the possible moves of the Pawn.
-         We are just going to create a boolean matrix of the size of the board.
-         */
+
         boolean[][] matrix = new boolean[getBoard().getNumberRows()][getBoard().getNumberColumns()];
 
         Position p = new Position(0, 0);
