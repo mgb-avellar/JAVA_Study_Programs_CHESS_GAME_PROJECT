@@ -2,6 +2,7 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
@@ -9,9 +10,18 @@ public class King extends ChessPiece {
 
     // Esta é a classe que representa a peça Rei
 
+    /*
+    In order to implement the Castling special move, the King must have access to the ChessMatch class
+    for then we can make the King understand the overrall state of the match, the possible moves and the
+    conditions to realize this movement.
+    I also need to implement a method to test the Castling conditions.
+     */
 
-    public King(Board board, Color color) {
+    private ChessMatch chessMatch; // this is how we associate the classes
+
+    public King(Board board, Color color, ChessMatch chessMatch) {
         super(board, color);
+        this.chessMatch = chessMatch;
     }
 
     @Override
@@ -33,12 +43,21 @@ public class King extends ChessPiece {
         return auxP == null || auxP.getColor() != getColor();
     }
 
+    /*
+    The Castling conditions
+     */
+
+    private boolean testRookCastling(Position position) {
+
+        // Is there a Rook in this position? If so, there are castling conditions?
+
+        ChessPiece p = (ChessPiece) getBoard().piece(position);
+        return p != null && p instanceof Rook && p.getColor() == getColor() && p.getMoveCount() == 0;
+    }
+
     @Override
     public boolean[][] possibleMoves() {
-        /*
-         For now, we are not going to implement the possible moves of the King.
-         We are just going to create a boolean matrix of the size of the board.
-         */
+
         boolean[][] matrix = new boolean[getBoard().getNumberRows()][getBoard().getNumberColumns()];
 
         Position auxP = new Position(0,0);
@@ -105,6 +124,53 @@ public class King extends ChessPiece {
         if (getBoard().positionExists(auxP) && canMove(auxP)) {
 
             matrix[auxP.getRow()][auxP.getColumn()] = true;
+        }
+
+        /*
+         Special move Castling: this is also a possible move, but a set of possibilities must
+         be fulfilled to realize this movement
+         */
+
+        if (getMoveCount() == 0 && !chessMatch.getCheck()) { // The King can not be in check and can not have made any movement.
+
+            /*
+             We also need to check if there is two vacant squares to the left and right of the King
+             and if the Rooks have not moved yet.
+             */
+
+            // First, the king-side castling (to the right)
+
+            Position posRook1 = new Position(position.getRow(), position.getColumn() + 3);
+            if (testRookCastling(posRook1)) {
+                // Here, the two positions to the right of the King
+                Position position1 = new Position(position.getRow(), position.getColumn() + 1);
+                Position position2 = new Position(position.getRow(), position.getColumn() + 2);
+
+                if (getBoard().piece(position1) == null && getBoard().piece(position2) == null ){
+                    // Now I must include this possibility to the matrix f possible movements of the King
+
+                    matrix[position.getRow()][position.getColumn() + 2] = true;
+                }
+            }
+
+            // Now, the queen-side castling (to the left)
+
+            // First, the king-side castling (to the right)
+
+            Position posRook2 = new Position(position.getRow(), position.getColumn() - 4);
+            if (testRookCastling(posRook1)) {
+                // Here, the three positions to the left of the King
+                Position position1 = new Position(position.getRow(), position.getColumn() - 1);
+                Position position2 = new Position(position.getRow(), position.getColumn() - 2);
+                Position position3 = new Position(position.getRow(), position.getColumn() - 3);
+
+                if (getBoard().piece(position1) == null && getBoard().piece(position2) == null && getBoard().piece(position3) == null ){
+                    // Now I must include this possibility to the matrix f possible movements of the King
+
+                    matrix[position.getRow()][position.getColumn() - 2] = true;
+                }
+            }
+
         }
 
         return matrix;
