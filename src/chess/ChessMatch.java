@@ -20,6 +20,7 @@ public class ChessMatch {
     private int turn;
     private Color currentPlayer;
     private boolean check;
+    private boolean checkMate;
 
     private Board board; // Every match has it own board
 
@@ -50,6 +51,11 @@ public class ChessMatch {
     public boolean getCheck() {
         return check;
         // This getter is needed to fully implement the check logic. I must leave this attribute accessible in the UI class to release a warning.
+    }
+
+    public boolean getCheckMate() {
+        return checkMate;
+        // This getter is needed to fully implement the check-mate logic. I must leave this attribute accessible in the UI class to release a warning.
     }
 
     public ChessPiece[][] getPieces() {
@@ -124,7 +130,17 @@ public class ChessMatch {
 
         check = ( testCheck(opponent(currentPlayer)) ) ? true : false;
 
-        nextTurn(); // Must be called after a move
+        if (testCheckMate(opponent(currentPlayer))) {
+
+            checkMate = true;
+        }
+        else {
+            nextTurn(); // Must be called after a move
+            // I moved this statement inside the 'else' to test the check-mate condition: if it is true, the match must end.
+            //  If not, the match must continue.
+        }
+
+
         return (ChessPiece) capturedPiece;
     }
 
@@ -198,10 +214,11 @@ public class ChessMatch {
 
         if (capturedPiece != null) {
             board.placePiece(capturedPiece, target);
+            capturedPiecesList.remove(capturedPiece);
+            piecesOnTheBoardList.add(capturedPiece);
         }
 
-        capturedPiecesList.remove(capturedPiece);
-        piecesOnTheBoardList.add(capturedPiece);
+
     }
 
     /*
@@ -257,6 +274,45 @@ public class ChessMatch {
         return false;
     }
 
+    private  boolean testCheckMate(Color color) {
+
+        if(!testCheck(color)) { // If this color is not in check, it is not in check-mate.
+            return false;
+        }
+
+        List<Piece> list = piecesOnTheBoardList.stream().filter(x -> ((ChessPiece) x).getColor() == color ).collect(Collectors.toList());
+
+        for (Piece p : list) {
+
+            boolean[][] matrix = p.possibleMoves();
+
+            for (int i = 0; i < board.getNumberRows(); i++) {
+                for (int j = 0; j < board.getNumberColumns(); j++) {
+
+                    if (matrix[i][j]) { // This statement is equivalent to "is the position (i,j) a possible movement?
+                        /*
+                        The logic here is the following:
+                        For each piece p that is of my color, I move it to a possible position;
+                        then I test again if this movement free my King from the check;
+                        if so, then I return 'false', i.e., I am not in check anymore.
+
+                         */
+                        Position source = ((ChessPiece) p).getChessPosition().toPosition();
+                        Position target = new Position(i, j);
+                        Piece capturedPiece = makeMove(source,target);
+                        boolean testCheck = testCheck(color);
+                        undoMove(source, target,capturedPiece); // I must undo the movement since I moved the piece only to test the check
+                        if (!testCheck) {
+                            return  false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+
+    }
+
     /*
     I create a method for placing a new piece on the chess board using the chess labels
     for positions (section 155)
@@ -293,21 +349,15 @@ public class ChessMatch {
 
          */
 
-        placeNewPiece('c', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 1, new King(board, Color.WHITE));
-        placeNewPiece('c', 1, new Rook(board, Color.WHITE));
 
-        placeNewPiece('c', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('c', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('e', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('e', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 8, new King(board, Color.BLACK));
+        placeNewPiece('h', 7, new Rook(board, Color.WHITE));
+        placeNewPiece('d', 1, new Rook(board, Color.WHITE));
+        placeNewPiece('e', 1, new King(board, Color.WHITE));
 
-        //placeNewPiece('c', 4, new King(board, Color.BLACK));
+        placeNewPiece('b', 8, new Rook(board, Color.BLACK));
+        placeNewPiece('a', 8, new King(board, Color.BLACK));
+
+
 
 
         // After this, I must call this method in the constructor above.

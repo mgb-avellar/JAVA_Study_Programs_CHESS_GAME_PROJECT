@@ -21,7 +21,7 @@ public class Main {
         ChessMatch chessMatch = new ChessMatch();
         List<ChessPiece> capturedList = new ArrayList<>();
 
-        while(true) {
+        while(!chessMatch.getCheckMate()) { // Now, the match continues while the check-mate condition is not reached
             try {
 
                 // Dealing with ChessException and InputMismatchException exceptions
@@ -62,6 +62,8 @@ public class Main {
 
         }
 
+        UI.clearScreen();
+        UI.printMatch(chessMatch, capturedList);
 
     }
 }

@@ -77,14 +77,26 @@ public class UI {
         printCapturedPieces(captured);  // printing captured pieces
         System.out.println();
         System.out.println("Turn: " + chessMatch.getTurn());
-        System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
+        // Below, testing the check-mate condition
+        if (!chessMatch.getCheckMate()) {
 
-        // The test below is to test if there is some player in check.
+            System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
 
-        if (chessMatch.getCheck()) { // If this statement is true, there is someone in check.
+            // The test below is to test if there is some player in check.
 
-            System.out.println("CHECK! ");
+            if (chessMatch.getCheck()) { // If this statement is true, there is someone in check.
+
+                System.out.println("CHECK! ");
+            }
+
+            // The statements above were moved inside this 'if' for the check mate logic
         }
+        else {
+
+            System.out.println("CHECK MATE!");
+            System.out.println("Winner: " + chessMatch.getCurrentPlayer());
+        }
+
 
     }
 
