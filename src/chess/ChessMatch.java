@@ -5,6 +5,7 @@ import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.*;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class ChessMatch {
     private boolean check;
     private boolean checkMate;
     private ChessPiece enPassantVulnerable; // This variable tells me if a Pawn is vulnerable to the En Passant move
+    private ChessPiece promoted; // For a Pawn who reaches the vertical border of the opponents
 
     private Board board; // Every match has it own board
 
@@ -60,6 +62,10 @@ public class ChessMatch {
 
     public ChessPiece getEnPassantVulnerable() {
         return enPassantVulnerable;
+    }
+
+    public ChessPiece getPromoted() {
+        return promoted;
     }
 
     public ChessPiece[][] getPieces() {
@@ -135,7 +141,20 @@ public class ChessMatch {
         // After the move, I must to know if the moved piece is a Pawn and if that Pawn moved 2 squares
         // For that, I create a reference for this moved piece, as below. It will be used to test the
         //  vulnerability to a En Passant move if the piece was, in fact, a Pawn.
+
         ChessPiece movedPiece = (ChessPiece)board.piece(target);
+
+        // The promotion move must be tested before the check test since when the promotion occurs,
+        //   there is a possibility that the promoted piece leaves the opponent's King in check automatically
+
+        promoted = null;
+        if (movedPiece instanceof Pawn) {
+            if ( (movedPiece.getColor() == Color.WHITE && target.getRow() == 0) || (movedPiece.getColor() == Color.BLACK && target.getRow() == 7) ) {
+                promoted = (ChessPiece) board.piece(target);
+                promoted = replacePromotedPiece("Q"); // I put Q by default, then I ask the user to choose the piece
+
+            }
+        }
 
         check = ( testCheck(opponent(currentPlayer)) ) ? true : false;
 
@@ -205,6 +224,48 @@ public class ChessMatch {
     private void nextTurn () {
         turn ++;
         currentPlayer = (currentPlayer == Color.WHITE) ? Color.BLACK : Color.WHITE;
+    }
+
+    // The method to promote a Pawn that reaches the vertical border of the opponent
+    public ChessPiece replacePromotedPiece(String type) {
+        // Defensive programming
+        if (promoted == null) {
+            throw new IllegalStateException("There is no piece to be promoted.");
+        }
+
+        if (!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")) {
+            throw new InvalidParameterException("Invalid type for promotion.");
+        }
+
+        Position pos = promoted.getChessPosition().toPosition();
+        Piece p = board.removePiece(pos); // I remove the promoted Pawn
+        piecesOnTheBoardList.remove(p); // I remove the promoted Pawn from the list of pieces
+
+        // I must instantiate the new piece, of the type chosen by the user. For that I need
+        //   an auxiliary method (see below) called newPiece
+
+        ChessPiece newPiece = newPiece(type, promoted.getColor());
+
+        board.placePiece(newPiece, pos);
+
+        piecesOnTheBoardList.add(newPiece);
+
+        return newPiece;
+    }
+
+    private ChessPiece newPiece (String type, Color color) {
+        if (type.equals("B")) {
+            return new Bishop(board, color);
+        }
+        else if (type.equals("N")) {
+            return new Knight(board, color);
+        }
+        else if (type.equals("R")) {
+            return new Rook(board, color);
+        }
+        else {
+            return new Queen(board, color);
+        }
     }
 
     private Piece makeMove(Position source, Position target) {

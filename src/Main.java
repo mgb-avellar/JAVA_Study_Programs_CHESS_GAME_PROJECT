@@ -50,6 +50,13 @@ public class Main {
                 if (capturedPiece != null) {
                     capturedList.add(capturedPiece);
                 }
+
+                // Asking for the user enter the piece to be promoted if it is the case
+                if (chessMatch.getPromoted() != null) {
+                    System.out.print("Enter piece for promotion (B/N/R/Q): ");
+                    String type = sc.nextLine();
+                    chessMatch.replacePromotedPiece(type);
+                }
             }
             catch (ChessException e) {
                 System.out.println(e.getMessage());
