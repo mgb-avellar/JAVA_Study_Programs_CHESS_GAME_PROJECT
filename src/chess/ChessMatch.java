@@ -20,6 +20,7 @@ public class ChessMatch {
     private Color currentPlayer;
     private boolean check;
     private boolean checkMate;
+    private ChessPiece enPassantVulnerable; // This variable tells me if a Pawn is vulnerable to the En Passant move
 
     private Board board; // Every match has it own board
 
@@ -55,6 +56,10 @@ public class ChessMatch {
     public boolean getCheckMate() {
         return checkMate;
         // This getter is needed to fully implement the check-mate logic. I must leave this attribute accessible in the UI class to release a warning.
+    }
+
+    public ChessPiece getEnPassantVulnerable() {
+        return enPassantVulnerable;
     }
 
     public ChessPiece[][] getPieces() {
@@ -127,6 +132,11 @@ public class ChessMatch {
             throw new ChessException("You can not put yourself in check.");
         }
 
+        // After the move, I must to know if the moved piece is a Pawn and if that Pawn moved 2 squares
+        // For that, I create a reference for this moved piece, as below. It will be used to test the
+        //  vulnerability to a En Passant move if the piece was, in fact, a Pawn.
+        ChessPiece movedPiece = (ChessPiece)board.piece(target);
+
         check = ( testCheck(opponent(currentPlayer)) ) ? true : false;
 
         if (testCheckMate(opponent(currentPlayer))) {
@@ -137,6 +147,20 @@ public class ChessMatch {
             nextTurn(); // Must be called after a move
             // I moved this statement inside the 'else' to test the check-mate condition: if it is true, the match must end.
             //  If not, the match must continue.
+        }
+
+        // For implementing the En Passant movement
+        /*
+        This special move only occurs if the Pawn moves two squares in its first move. Then it becomes vulnerable
+        to suffer this special capture from an opponent Pawn.
+         */
+
+        // If the piece is a pawn and has moved 2 lines then
+        if (movedPiece instanceof Pawn && (target.getRow() == source.getRow() - 2 || target.getRow() == source.getRow() + 2)) {
+            enPassantVulnerable = movedPiece;
+        }
+        else {
+            enPassantVulnerable = null;
         }
 
 
@@ -233,6 +257,28 @@ public class ChessMatch {
             rook.increaseMoveCount();
         }
 
+        // For implementing the En Passant move
+        // Every time I move a piece, I must test if it was a En Passant movement;
+        // In the case of an En Passant move, I need a special treatment since the mechanics is different
+
+        if (auxP instanceof Pawn) {
+            // Have my Pawn moved in diagonal and did not capture a opponent's piece? Is so, it is a En Passant
+            if (source.getColumn() != target.getColumn() && capturedPiece == null) {
+                Position pawnPosition;
+                if (auxP.getColor() == Color.WHITE) {
+                    pawnPosition = new Position(target.getRow() + 1, target.getColumn());
+                    // This command tells me to capture the black Pawn that is just below the white Pawn
+                }
+                else {
+                    pawnPosition = new Position(target.getRow() - 1, target.getColumn());
+                    // This command tells me to capture the white Pawn that is just above the black Pawn
+                }
+                capturedPiece = board.removePiece(pawnPosition);
+                capturedPiecesList.add(capturedPiece);
+                piecesOnTheBoardList.remove(capturedPiece);
+            }
+        }
+
         return capturedPiece;
     }
 
@@ -278,6 +324,26 @@ public class ChessMatch {
             ChessPiece rook = (ChessPiece) board.removePiece(targetRook1); // I remove the Rook from its current position
             board.placePiece(rook,sourceRook1); // I place the Rook at the target position
             rook.decreaseMoveCount();
+        }
+
+        // For implementing the En Passant move: undoing it
+
+        if (auxP instanceof Pawn) {
+            if (source.getColumn() != target.getColumn() && capturedPiece == enPassantVulnerable) {
+
+                // To undo the En Passant, we must recall that the undoMove puts the captured piece back in
+                //   the target position of the piece who captured it. This is wrong for the En Passant move:
+                //   we must put the captured piece back in the row 3, if white, or 4, if black.
+                ChessPiece pawn = (ChessPiece)board.removePiece(target);
+                Position pawnPosition;
+                if (auxP.getColor() == Color.WHITE) {
+                    pawnPosition = new Position(3, target.getColumn());
+                }
+                else {
+                    pawnPosition = new Position(4, target.getColumn());
+                }
+                board.placePiece(pawn, pawnPosition);
+            }
         }
 
 
@@ -409,14 +475,14 @@ public class ChessMatch {
         placeNewPiece('f', 1, new Bishop(board, Color.WHITE));
         placeNewPiece('b', 1, new Knight(board, Color.WHITE));
         placeNewPiece('g', 1, new Knight(board, Color.WHITE));
-        placeNewPiece('a', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('b', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('c', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('d', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('e', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('f', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('g', 2, new Pawn(board, Color.WHITE));
-        placeNewPiece('h', 2, new Pawn(board, Color.WHITE));
+        placeNewPiece('a', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('b', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('c', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('d', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('e', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('f', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('g', 2, new Pawn(board, Color.WHITE, this));
+        placeNewPiece('h', 2, new Pawn(board, Color.WHITE, this));
 
 
         // Black pieces
@@ -429,14 +495,14 @@ public class ChessMatch {
         placeNewPiece('f', 8, new Bishop(board, Color.BLACK));
         placeNewPiece('b', 8, new Knight(board, Color.BLACK));
         placeNewPiece('g', 8, new Knight(board, Color.BLACK));
-        placeNewPiece('a', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('b', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('c', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('d', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('e', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('f', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('g', 7, new Pawn(board, Color.BLACK));
-        placeNewPiece('h', 7, new Pawn(board, Color.BLACK));
+        placeNewPiece('a', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('b', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('c', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('d', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('e', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('f', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('g', 7, new Pawn(board, Color.BLACK, this));
+        placeNewPiece('h', 7, new Pawn(board, Color.BLACK, this));
 
 
 
